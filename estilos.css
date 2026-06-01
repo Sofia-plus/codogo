@@ -1,55 +1,102 @@
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet');
-
-body {
-    text-align: center;
-    background-color: #a7d0f4;
-    font-family: 'Permanent Marker', cursive;
+body{
+font-family: Arial, Helvetica, sans-serif;
 }
 
-h1 {
-    color: #0e0d5d;
-    font-size: 3em;
-    margin-top: 30px;
-    font-family: 'Permanent Marker', cursive;
+.hidden{
+display:none;
 }
 
-.imagen-intermedia {
-    display: block;
-    margin: 20px auto;
-    max-width: 400px;
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
+.menu-btn{
+background:#18181b;
+padding:10px 16px;
+border-radius:12px;
+transition:.3s;
 }
 
-button {
-    background-color: #ff4500;
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 1.2em;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 20px;
-    font-family: 'Permanent Marker', cursive;
+.menu-btn:hover
+
+.input-field{
+width:100%;
+padding:12px;
+margin-top:10px;
+margin-bottom:10px;
+border-radius:12px;
+border:1px solid #3f3f46;
+background:#18181b;
+color:white;
 }
 
-button:hover {
-    background-color: #bb523f;
+.input-field:focus{
+outline:none;
+border-color:#10b981;
 }
 
-@media screen and (max-width: 768px) {
-    h1 {
-        font-size: 2em;
-    }
-
-    .imagen-intermedia {
-        max-width: 300px;
-    }
-
-    button {
-        padding: 12px 20px;
-        font-size: 1em;
-    }
+.main-btn{
+width:100%;
+margin-top:15px;
+padding:12px;
+border:none;
+border-radius:12px;
+background:#10b981;
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:.3s;
 }
 
+.main-btn:hover
+
+.card{
+background:#18181b;
+padding:24px;
+border-radius:24px;
+border:1px solid #27272a;
+}
+
+.card:hover{
+transform:translateY(-5px);
+transition:.3s;
+}
+
+#map{
+border-radius:20px;
+overflow:hidden;
+}
+
+#userNameDisplay{
+margin-right:10px;
+color:#10b981;
+font-weight:bold;
+}
+
+::-webkit-scrollbar{
+width:8px;
+}
+
+::-webkit-scrollbar-track{
+background:#09090b;
+}
+
+::-webkit-scrollbar-thumb{
+background:#10b981;
+border-radius:10px;
+}
+
+.section{
+animation:fadeIn .3s ease-in-out;
+}
+
+@keyframes fadeIn{
+from{
+opacity:0;
+transform:translateY(10px);
+}
+
+```
+to{
+    opacity:1;
+    transform:translateY(0);
+}
+```
+
+}
