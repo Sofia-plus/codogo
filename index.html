@@ -1,203 +1,333 @@
-<!DOCTYPE html>
-<!--
-  Nota: Este archivo define comportamiento de verificación GPS y subida de fotos.
-  Requisitos y supuestos:
-  - La verificación GPS es REAL: registra una posición inicial, luego usa watchPosition y calcula distancia real con la fórmula de Haversine.
-  - Solo completa la misión cuando dist >= 1.8 km, no tras un solo fix.
-  - Validación de posición: se descartan lecturas con accuracy > 50m o timestamp mayor a 30s.
-  - Validación de imagen: accept="image/*" con file.type ∈ ['image/jpeg','image/png','image/webp'] y file.size ≤ 5MB.
-  - Subir foto con POST FormData a /api/verify-photo y marca verificada solo cuando response.ok.
-  - Si el endpoint no existe, el cliente informa y no marca la foto como verificada automáticamente.
--->
+i<!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuestLink - Juega más inteligente</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  
-  <style>
-    body { font-family: 'Poppins', sans-serif; }
-    .game-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .game-card:hover { transform: translateY(-6px); }
-    .nav-link { transition: all 0.2s; }
-    .nav-link.active { color: #10b981; border-bottom: 3px solid #10b981; }
-    #map { height: 500px; border-radius: 20px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuestLink</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 </head>
+
 <body class="bg-zinc-950 text-white">
 
-  <!-- Navbar -->
-  <nav class="bg-black p-4 flex justify-between items-center border-b border-zinc-800 sticky top-0 z-50">
-    <div class="flex items-center gap-3">
-      <h1 class="text-3xl font-bold text-emerald-400">QuestLink</h1>
-      <span class="text-sm text-zinc-500">v1.0</span>
-    </div>
-    <div class="flex items-center gap-8 text-sm">
-      <a href="#" data-section="dashboard" onclick="event.preventDefault(); showSection('dashboard', this)" class="nav-link active font-medium">Inicio</a>
-      <a href="#" data-section="missions" onclick="event.preventDefault(); showSection('missions', this)" class="nav-link font-medium">Misiones</a>
-      <a href="#" data-section="map" onclick="event.preventDefault(); showSection('map', this)" class="nav-link font-medium">Mapa</a>
-      <a href="#" data-section="store" onclick="event.preventDefault(); showSection('store', this)" class="nav-link font-medium">Tienda</a>
-      <a href="#" data-section="profile" onclick="event.preventDefault(); showSection('profile', this)" class="nav-link font-medium">Perfil</a>
-    </div>
-    <div id="authActions" class="flex items-center gap-4">
-      <span id="userNameDisplay" class="hidden text-sm text-zinc-400"></span>
-      <button id="logoutButton" type="button" onclick="logout()" class="hidden rounded-2xl bg-red-500 px-4 py-2 text-sm font-medium hover:bg-red-600">Cerrar sesión</button>
-    </div>
-  </nav>
+<nav class="bg-black border-b border-zinc-800 p-4 flex justify-between items-center">
 
-  <div class="max-w-7xl mx-auto p-6">
+<h1 class="text-3xl font-bold text-emerald-400">
+QuestLink
+</h1>
 
-    <!-- ==================== AUTENTICACIÓN ==================== -->
-    <div id="auth" class="section">
-      <div class="max-w-xl mx-auto bg-zinc-900 rounded-3xl p-8">
-        <h2 class="text-3xl font-bold mb-4">Bienvenido a QuestLink</h2>
-        <p class="text-zinc-400 mb-6">Inicia sesión o regístrate para comenzar a verificar misiones, subir fotos y ganar tokens.</p>
+<div class="flex gap-4">
 
-        <div class="mb-6 flex gap-2">
-          <button type="button" id="loginTab" onclick="setAuthMode('login')" class="rounded-full border border-zinc-700 bg-emerald-500 px-4 py-2 text-sm font-medium">Iniciar sesión</button>
-          <button type="button" id="registerTab" onclick="setAuthMode('register')" class="rounded-full border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium">Registrarse</button>
-        </div>
+<button onclick="showSection('dashboard')" class="menu-btn">
+Inicio
+</button>
 
-        <div id="authMessage" class="mb-4 rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-zinc-300 hidden"></div>
+<button onclick="showSection('missions')" class="menu-btn">
+Misiones
+</button>
 
-        <div id="loginForm">
-          <label class="block text-sm font-medium text-zinc-300">Correo electrónico</label>
-          <input id="loginEmail" type="email" class="mt-2 w-full rounded-3xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-emerald-400" placeholder="tucorreo@ejemplo.com" />
-          <label class="mt-4 block text-sm font-medium text-zinc-300">Contraseña</label>
-          <input id="loginPassword" type="password" class="mt-2 w-full rounded-3xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-emerald-400" placeholder="Contraseña" />
-          <button type="button" onclick="submitLogin()" class="mt-6 w-full rounded-3xl bg-emerald-500 px-6 py-3 text-sm font-semibold hover:bg-emerald-600">Entrar</button>
-        </div>
+<button onclick="showSection('mapSection')" class="menu-btn">
+Mapa
+</button>
 
-        <div id="registerForm" class="hidden">
-          <label class="block text-sm font-medium text-zinc-300">Nombre de usuario</label>
-          <input id="registerUsername" type="text" class="mt-2 w-full rounded-3xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-emerald-400" placeholder="Tu nombre" />
-          <label class="mt-4 block text-sm font-medium text-zinc-300">Correo electrónico</label>
-          <input id="registerEmail" type="email" class="mt-2 w-full rounded-3xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-emerald-400" placeholder="tucorreo@ejemplo.com" />
-          <label class="mt-4 block text-sm font-medium text-zinc-300">Contraseña</label>
-          <input id="registerPassword" type="password" class="mt-2 w-full rounded-3xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-emerald-400" placeholder="Contraseña" />
-          <label class="mt-4 block text-sm font-medium text-zinc-300">Confirmar contraseña</label>
-          <input id="registerConfirmPassword" type="password" class="mt-2 w-full rounded-3xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-white outline-none focus:border-emerald-400" placeholder="Repite la contraseña" />
-          <button type="button" onclick="submitRegister()" class="mt-6 w-full rounded-3xl bg-emerald-500 px-6 py-3 text-sm font-semibold hover:bg-emerald-600">Crear cuenta</button>
-        </div>
-      </div>
-    </div>
+<button onclick="showSection('store')" class="menu-btn">
+Tienda
+</button>
 
-    <!-- ==================== DASHBOARD ==================== -->
-    <div id="dashboard" class="section hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 bg-zinc-900 rounded-3xl p-8">
-          <h2 class="text-3xl font-bold mb-2">¡Hola, <span id="dashboardUsername">Alex</span>!</h2>
-          <p class="text-zinc-400 mb-6">Nivel 12 • Balance 78%</p>
+<button onclick="showSection('profile')" class="menu-btn">
+Perfil
+</button>
 
-          <div class="bg-zinc-800 rounded-2xl p-6 mb-8">
-            <div class="flex justify-between mb-3">
-              <span class="text-emerald-400">Energía Real</span>
-              <span class="text-orange-400">Energía Virtual</span>
-            </div>
-            <div class="h-5 bg-zinc-700 rounded-full overflow-hidden">
-              <div class="h-full w-[78%] bg-gradient-to-r from-emerald-400 to-orange-400"></div>
-            </div>
-          </div>
+</div>
 
-          <h3 class="text-xl font-semibold mb-4">Misiones Echo Activas</h3>
-          <div class="space-y-4">
-            <div class="bg-zinc-800 rounded-2xl p-5 game-card flex gap-4">
-              <div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center text-3xl">🐉</div>
-              <div class="flex-1">
-                <p class="font-semibold">Derrotaste un Dragón en Roblox</p>
-                <p class="text-sm text-zinc-400">Camina 1.8 km cerca de tu casa (verificación GPS real de distancia)</p>
-                <button type="button" onclick="startWalkVerification(1, this)" class="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl text-sm font-medium w-full">
-                  Iniciar Verificación GPS (comprobación real)
-                </button>
-              </div>
-            </div>
+<div>
+<span id="userNameDisplay"></span>
 
-            <div class="bg-zinc-800 rounded-2xl p-5 game-card flex gap-4">
-              <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-3xl">🏠</div>
-              <div class="flex-1">
-                <p class="font-semibold">Construiste en Minecraft</p>
-                <p class="text-sm text-zinc-400">Sube foto de tu escritorio ordenado (JPEG/PNG/WEBP ≤ 5MB, verificación de servidor)</p>
-                <input id="photoUpload-2" type="file" accept="image/*" class="mt-3 block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:bg-emerald-500 file:text-white"/>
-                <button type="button" onclick="uploadPhoto(2, this)" class="mt-3 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl text-sm font-medium w-full">
-                  Subir y Verificar Foto
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+<button
+id="logoutButton"
+onclick="logout()"
+class="bg-red-500 px-4 py-2 rounded-xl hidden">
+Cerrar sesión </button>
 
-        <div class="space-y-6">
-          <div class="bg-zinc-900 rounded-3xl p-6">
-            <h3 class="font-semibold mb-4">Juegos Conectados</h3>
-            <div class="flex flex-wrap gap-3">
-              <div class="bg-zinc-800 px-4 py-2 rounded-2xl text-sm">Roblox</div>
-              <div class="bg-zinc-800 px-4 py-2 rounded-2xl text-sm">Fortnite</div>
-              <div class="bg-zinc-800 px-4 py-2 rounded-2xl text-sm">Minecraft</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+</div>
 
-    <!-- ==================== MISIONES ==================== -->
-    <div id="missions" class="section hidden">
-      <div class="bg-zinc-900 rounded-3xl p-8">
-        <h2 class="text-3xl font-bold mb-2">Misiones Echo</h2>
-        <p class="text-zinc-400 mb-6">Aquí están tus misiones activas y el estado de verificación.</p>
-        <div class="space-y-4">
-          <div class="bg-zinc-800 rounded-2xl p-5 game-card flex gap-4">
-            <div class="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center text-3xl">🐉</div>
-            <div class="flex-1">
-              <p class="font-semibold">Derrotaste un Dragón en Roblox</p>
-              <p class="text-sm text-zinc-400">Camina 1.8 km cerca de tu casa (verificación GPS real de distancia)</p>
-              <button type="button" onclick="startWalkVerification(1, this)" class="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl text-sm font-medium w-full">
-                Iniciar Verificación GPS (verificación real de 1.8 km de 1.8 km)
-              </button>
-            </div>
-          </div>
-          <div class="bg-zinc-800 rounded-2xl p-5 game-card flex gap-4">
-            <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-3xl">🏠</div>
-            <div class="flex-1">
-              <p class="font-semibold">Construiste en Minecraft</p>
-              <p class="text-sm text-zinc-400">Sube foto de tu escritorio ordenado (JPEG/PNG/WEBP ≤ 5MB, verificación de servidor)</p>
-              <input id="photoUpload-missions-2" type="file" accept="image/*" class="mt-3 block w-full text-sm text-zinc-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:bg-emerald-500 file:text-white"/>
-              <button type="button" onclick="uploadPhoto('missions-2', this)" class="mt-3 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl text-sm font-medium w-full">
-                Subir y Verificar Foto
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+</nav>
 
-    <!-- ==================== MAPA ==================== -->
-    <div id="map" class="section hidden">
-      <h2 class="text-3xl font-bold mb-6">Mapa de Quests</h2>
-      <div id="map-container" class="bg-zinc-900 rounded-3xl p-4"></div>
-    </div>
+<div class="container mx-auto p-6">
 
-    <!-- ==================== TIENDA ==================== -->
-    <div id="store" class="section hidden">
-      <h2 class="text-3xl font-bold mb-6">Tienda de Recompensas</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-zinc-900 rounded-3xl p-6 text-center">
-          <div class="text-6xl mb-4">⚔️</div>
-          <h3 class="font-bold">Skin Legendaria</h3>
-          <p class="text-emerald-400 text-2xl font-bold mt-2">150 Tokens</p>
-          <button type="button" onclick="buyItem(this)" class="mt-4 w-full py-3 bg-emerald-500 rounded-2xl">Canjear</button>
-        </div>
-        <div class="bg-zinc-900 rounded-3xl p-6 text-center">
-          <div class="text-6xl mb-4">⏱️</div>
-          <h3 class="font-bold">+2 Horas de Juego</h3>
-          <p class="text-emerald-400 text-2xl font-bold mt-2">80 Tokens</p>
-          <button type="button" onclick="buyItem(this)" class="mt-4 w-full py-3 bg-emerald-500 rounded-2xl">Canjear</button>
-        </div>
-        <div class="bg-zinc-900 rounded-3xl p-6 text-center">
-          <div class="text-6xl mb-4">🔥</div>
-          <h3 class="font-bold">Boost XP x2 (1 día)</h3>
-          <p class="text-emerald-400 text-2xl font-bold mt-2">120 Tokens</p>
-          <button type="button" onclick="buyItem
+<!-- LOGIN -->
+
+<div id="auth" class="section">
+
+<div class="max-w-lg mx-auto bg-zinc-900 p-8 rounded-3xl">
+
+<h2 class="text-3xl font-bold mb-6">
+Bienvenido a QuestLink
+</h2>
+
+<div class="flex gap-2 mb-6">
+
+<button
+id="loginTab"
+onclick="setAuthMode('login')"
+class="bg-emerald-500 px-4 py-2 rounded-xl">
+Iniciar sesión </button>
+
+<button
+id="registerTab"
+onclick="setAuthMode('register')"
+class="bg-zinc-800 px-4 py-2 rounded-xl">
+Registrarse </button>
+
+</div>
+
+<!-- LOGIN -->
+
+<div id="loginForm">
+
+<input
+id="loginEmail"
+type="email"
+placeholder="Correo"
+class="input-field">
+
+<input
+id="loginPassword"
+type="password"
+placeholder="Contraseña"
+class="input-field">
+
+<button
+onclick="submitLogin()"
+class="main-btn">
+Entrar </button>
+
+</div>
+
+<!-- REGISTER -->
+
+<div id="registerForm" class="hidden">
+
+<input
+id="registerUsername"
+type="text"
+placeholder="Usuario"
+class="input-field">
+
+<input
+id="registerEmail"
+type="email"
+placeholder="Correo"
+class="input-field">
+
+<input
+id="registerPassword"
+type="password"
+placeholder="Contraseña"
+class="input-field">
+
+<input
+id="registerConfirmPassword"
+type="password"
+placeholder="Confirmar contraseña"
+class="input-field">
+
+<button
+onclick="submitRegister()"
+class="main-btn">
+Crear cuenta </button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="section hidden">
+
+<h2 class="text-4xl font-bold mb-6">
+Hola,
+<span id="dashboardUsername">
+Jugador
+</span>
+</h2>
+
+<div class="grid md:grid-cols-2 gap-6">
+
+<div class="card">
+
+<h3 class="text-xl font-bold">
+🐉 Misión GPS
+</h3>
+
+<p>
+Camina 1.8 km para completar la misión.
+</p>
+
+<button
+onclick="startWalkVerification(1,this)"
+class="main-btn">
+Iniciar GPS </button>
+
+</div>
+
+<div class="card">
+
+<h3 class="text-xl font-bold">
+🏠 Misión Foto
+</h3>
+
+<p>
+Sube una foto de tu escritorio.
+</p>
+
+<input
+id="photoUpload-2"
+type="file"
+accept="image/*"
+class="mt-3">
+
+<button
+onclick="uploadPhoto(2,this)"
+class="main-btn">
+Subir Foto </button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- MISIONES -->
+
+<div id="missions" class="section hidden">
+
+<h2 class="text-3xl font-bold mb-6">
+Misiones
+</h2>
+
+<div class="card">
+
+<h3 class="text-xl font-bold">
+🐉 Caminar 1.8 KM
+</h3>
+
+<button
+onclick="startWalkVerification(1,this)"
+class="main-btn">
+Verificar GPS </button>
+
+</div>
+
+</div>
+
+<!-- MAPA -->
+
+<div id="mapSection" class="section hidden">
+
+<h2 class="text-3xl font-bold mb-6">
+Mapa
+</h2>
+
+<div
+id="map"
+style="height:500px;">
+</div>
+
+</div>
+
+<!-- TIENDA -->
+
+<div id="store" class="section hidden">
+
+<h2 class="text-3xl font-bold mb-6">
+Tienda
+</h2>
+
+<div class="grid md:grid-cols-3 gap-6">
+
+<div class="card">
+
+<h3>⚔️ Skin Legendaria</h3>
+
+<p>150 Tokens</p>
+
+<button
+onclick="buyItem(this)"
+class="main-btn">
+Canjear </button>
+
+</div>
+
+<div class="card">
+
+<h3>⏱️ +2 Horas</h3>
+
+<p>80 Tokens</p>
+
+<button
+onclick="buyItem(this)"
+class="main-btn">
+Canjear </button>
+
+</div>
+
+<div class="card">
+
+<h3>🔥 XP x2</h3>
+
+<p>120 Tokens</p>
+
+<button
+onclick="buyItem(this)"
+class="main-btn">
+Canjear </button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- PERFIL -->
+
+<div id="profile" class="section hidden">
+
+<h2 class="text-3xl font-bold mb-6">
+Perfil
+</h2>
+
+<div class="card">
+
+<p id="profileName">
+Usuario
+</p>
+
+<p>
+Nivel 1
+</p>
+
+<p>
+0 Tokens
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
