@@ -1,450 +1,338 @@
 alert("JavaScript conectado");
-let map;
-let watchId;
+
+let map = null;
+let watchId = null;
 let startPosition = null;
 
 // Mostrar secciones
-function showSection(sectionId){
+function showSection(sectionId) {
 
-```
-document.querySelectorAll(".section").forEach(section=>{
-    section.classList.add("hidden");
-});
+    document.querySelectorAll(".section").forEach(section => {
+        section.classList.add("hidden");
+    });
 
-document.getElementById(sectionId)
-    .classList.remove("hidden");
+    const section = document.getElementById(sectionId);
 
-if(sectionId === "mapSection"){
-    setTimeout(initMap,300);
-}
-```
+    if (section) {
+        section.classList.remove("hidden");
+    }
 
+    if (sectionId === "map") {
+        setTimeout(initMap, 300);
+    }
 }
 
 // Cambiar entre login y registro
-function setAuthMode(mode){
+function setAuthMode(mode) {
 
-```
-const loginForm =
-    document.getElementById("loginForm");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
 
-const registerForm =
-    document.getElementById("registerForm");
+    if (!loginForm || !registerForm) return;
 
-if(mode === "login"){
-
-    loginForm.classList.remove("hidden");
-    registerForm.classList.add("hidden");
-
-}else{
-
-    registerForm.classList.remove("hidden");
-    loginForm.classList.add("hidden");
-
-}
-```
-
+    if (mode === "login") {
+        loginForm.classList.remove("hidden");
+        registerForm.classList.add("hidden");
+    } else {
+        registerForm.classList.remove("hidden");
+        loginForm.classList.add("hidden");
+    }
 }
 
 // Registrar usuario
-function submitRegister(){
+function submitRegister() {
 
-```
-const username =
-    document.getElementById("registerUsername").value.trim();
+    const username = document.getElementById("registerUsername").value.trim();
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value;
+    const confirmPassword = document.getElementById("registerConfirmPassword").value;
 
-const email =
-    document.getElementById("registerEmail").value.trim();
+    if (!username || !email || !password || !confirmPassword) {
+        alert("Completa todos los campos");
+        return;
+    }
 
-const password =
-    document.getElementById("registerPassword").value;
+    if (password !== confirmPassword) {
+        alert("Las contraseñas no coinciden");
+        return;
+    }
 
-const confirm =
-    document.getElementById("registerConfirmPassword").value;
+    if (localStorage.getItem(email)) {
+        alert("Este correo ya está registrado");
+        return;
+    }
 
-if(!username || !email || !password){
-    alert("Completa todos los campos");
-    return;
-}
+    const user = {
+        username,
+        email,
+        password,
+        level: 1,
+        tokens: 0
+    };
 
-if(password !== confirm){
-    alert("Las contraseñas no coinciden");
-    return;
-}
+    localStorage.setItem(email, JSON.stringify(user));
 
-if(localStorage.getItem(email)){
-    alert("Ese correo ya está registrado");
-    return;
-}
+    alert("Cuenta creada correctamente");
 
-const user = {
-    username,
-    email,
-    password,
-    level:1,
-    tokens:0
-};
+    document.getElementById("registerUsername").value = "";
+    document.getElementById("registerEmail").value = "";
+    document.getElementById("registerPassword").value = "";
+    document.getElementById("registerConfirmPassword").value = "";
 
-localStorage.setItem(
-    email,
-    JSON.stringify(user)
-);
-
-alert("Cuenta creada correctamente");
-
-setAuthMode("login");
-```
-
+    setAuthMode("login");
 }
 
 // Iniciar sesión
-function submitLogin(){
+function submitLogin() {
 
-```
-const email =
-    document.getElementById("loginEmail").value.trim();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
 
-const password =
-    document.getElementById("loginPassword").value;
+    const user = JSON.parse(localStorage.getItem(email));
 
-const user =
-    JSON.parse(localStorage.getItem(email));
+    if (!user) {
+        alert("Usuario no encontrado");
+        return;
+    }
 
-if(!user){
-    alert("Usuario no encontrado");
-    return;
-}
+    if (user.password !== password) {
+        alert("Contraseña incorrecta");
+        return;
+    }
 
-if(user.password !== password){
-    alert("Contraseña incorrecta");
-    return;
-}
+    localStorage.setItem("loggedUser", email);
 
-localStorage.setItem(
-    "loggedUser",
-    email
-);
+    loadUser(user);
 
-loadUser(user);
-
-showSection("dashboard");
-```
-
+    showSection("dashboard");
 }
 
 // Cargar usuario
-function loadUser(user){
+function loadUser(user) {
 
-```
-document.getElementById(
-    "dashboardUsername"
-).textContent = user.username;
+    const dashboardUsername = document.getElementById("dashboardUsername");
+    const userNameDisplay = document.getElementById("userNameDisplay");
+    const logoutButton = document.getElementById("logoutButton");
 
-document.getElementById(
-    "profileName"
-).textContent = user.username;
+    if (dashboardUsername) {
+        dashboardUsername.textContent = user.username;
+    }
 
-document.getElementById(
-    "userNameDisplay"
-).textContent = user.username;
+    if (userNameDisplay) {
+        userNameDisplay.textContent = user.username;
+        userNameDisplay.classList.remove("hidden");
+    }
 
-document.getElementById(
-    "logoutButton"
-).classList.remove("hidden");
-```
+    if (logoutButton) {
+        logoutButton.classList.remove("hidden");
+    }
 
+    const authSection = document.getElementById("auth");
+
+    if (authSection) {
+        authSection.classList.add("hidden");
+    }
 }
 
 // Cerrar sesión
-function logout(){
+function logout() {
 
-```
-localStorage.removeItem(
-    "loggedUser"
-);
+    localStorage.removeItem("loggedUser");
 
-location.reload();
-```
+    alert("Sesión cerrada");
 
+    location.reload();
 }
 
-// Comprar objeto
-function buyItem(btn){
+// Comprar artículos
+function buyItem(button) {
 
-```
-alert(
-    "Artículo canjeado correctamente"
-);
+    button.innerText = "Canjeado";
+    button.disabled = true;
 
-btn.innerText = "Canjeado";
-
-btn.disabled = true;
-```
-
+    alert("Recompensa canjeada");
 }
 
 // Subir foto
-function uploadPhoto(id,btn){
+function uploadPhoto(id, button) {
 
-```
-const input =
-    document.getElementById(
-        `photoUpload-${id}`
-    );
+    const input = document.getElementById(`photoUpload-${id}`);
 
-if(!input){
-    alert("No se encontró el campo");
-    return;
+    if (!input) {
+        alert("No se encontró el campo de imagen");
+        return;
+    }
+
+    const file = input.files[0];
+
+    if (!file) {
+        alert("Selecciona una imagen");
+        return;
+    }
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+        alert("Formato no permitido");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("La imagen supera los 5MB");
+        return;
+    }
+
+    button.innerText = "Foto verificada";
+    button.disabled = true;
+
+    alert("Imagen validada correctamente");
 }
 
-const file = input.files[0];
+// Calcular distancia GPS
+function calculateDistance(lat1, lon1, lat2, lon2) {
 
-if(!file){
-    alert("Selecciona una imagen");
-    return;
-}
+    const R = 6371000;
 
-const allowed = [
-    "image/jpeg",
-    "image/png",
-    "image/webp"
-];
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
 
-if(!allowed.includes(file.type)){
-    alert("Formato inválido");
-    return;
-}
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
 
-if(file.size > 5*1024*1024){
-    alert("Máximo 5MB");
-    return;
-}
-
-btn.innerText =
-    "Foto verificada";
-
-btn.disabled = true;
-
-alert("Imagen validada");
-```
-
-}
-
-// Distancia GPS
-function calculateDistance(lat1,lon1,lat2,lon2){
-
-```
-const R = 6371000;
-
-const dLat =
-    (lat2-lat1) * Math.PI/180;
-
-const dLon =
-    (lon2-lon1) * Math.PI/180;
-
-const a =
-    Math.sin(dLat/2) *
-    Math.sin(dLat/2)
-    +
-    Math.cos(lat1*Math.PI/180)
-    *
-    Math.cos(lat2*Math.PI/180)
-    *
-    Math.sin(dLon/2)
-    *
-    Math.sin(dLon/2);
-
-const c =
-    2 * Math.atan2(
+    const c = 2 * Math.atan2(
         Math.sqrt(a),
-        Math.sqrt(1-a)
+        Math.sqrt(1 - a)
     );
 
-return R*c;
-```
-
+    return R * c;
 }
 
-// GPS REAL
-function startWalkVerification(id,btn){
+// Verificación GPS
+function startWalkVerification(id, button) {
 
-```
-if(!navigator.geolocation){
+    if (!navigator.geolocation) {
+        alert("GPS no disponible");
+        return;
+    }
 
-    alert(
-        "Tu navegador no soporta GPS"
-    );
+    button.innerText = "Iniciando GPS...";
 
-    return;
-}
+    navigator.geolocation.getCurrentPosition(
 
-btn.innerText =
-    "Esperando movimiento...";
+        function(position) {
 
-navigator.geolocation.getCurrentPosition(
+            startPosition = {
+                lat: position.coords.latitude,
+                lon: position.coords.longitude
+            };
 
-    function(position){
+            watchId = navigator.geolocation.watchPosition(
 
-        startPosition = {
+                function(newPosition) {
 
-            lat:position.coords.latitude,
-
-            lon:position.coords.longitude
-        };
-
-        watchId =
-        navigator.geolocation.watchPosition(
-
-            function(newPosition){
-
-                const distance =
-                calculateDistance(
-
-                    startPosition.lat,
-
-                    startPosition.lon,
-
-                    newPosition.coords.latitude,
-
-                    newPosition.coords.longitude
-
-                );
-
-                btn.innerText =
-                "Distancia: "
-                +
-                Math.round(distance)
-                +
-                " m";
-
-                if(distance >= 1800){
-
-                    navigator.geolocation
-                    .clearWatch(watchId);
-
-                    btn.innerText =
-                    "Misión completada";
-
-                    btn.disabled = true;
-
-                    alert(
-                    "Has recorrido 1.8 km"
+                    const distance = calculateDistance(
+                        startPosition.lat,
+                        startPosition.lon,
+                        newPosition.coords.latitude,
+                        newPosition.coords.longitude
                     );
+
+                    button.innerText =
+                        "Distancia: " +
+                        Math.round(distance) +
+                        " m";
+
+                    if (distance >= 1800) {
+
+                        navigator.geolocation.clearWatch(watchId);
+
+                        button.innerText = "Misión completada";
+                        button.disabled = true;
+
+                        alert("¡Has recorrido 1.8 km!");
+                    }
+
+                },
+
+                function() {
+                    alert("Error al leer el GPS");
+                },
+
+                {
+                    enableHighAccuracy: true
                 }
+            );
+        },
 
-            },
-
-            function(){
-
-                alert(
-                    "Error al obtener ubicación"
-                );
-
-            },
-
-            {
-                enableHighAccuracy:true
-            }
-        );
-
-    },
-
-    function(){
-
-        alert(
-            "Permiso GPS denegado"
-        );
-
-    }
-);
-```
-
-}
-
-// Mapa
-function initMap(){
-
-```
-if(map){
-    map.invalidateSize();
-    return;
-}
-
-map = L.map("map")
-.setView(
-    [4.7110,-74.0721],
-    13
-);
-
-L.tileLayer(
-    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-        attribution:
-        "&copy; OpenStreetMap"
-    }
-).addTo(map);
-
-navigator.geolocation.getCurrentPosition(
-
-    function(pos){
-
-        const lat =
-            pos.coords.latitude;
-
-        const lon =
-            pos.coords.longitude;
-
-        map.setView(
-            [lat,lon],
-            15
-        );
-
-        L.marker(
-            [lat,lon]
-        )
-        .addTo(map)
-        
-        .bindPopup(
-            "Tu ubicación"
-        )
-        .openPopup();
-    }
-);
-```
-
-}
-
-// Mantener sesión iniciada
-window.onload = ()=>{
-
-```
-const email =
-    localStorage.getItem(
-        "loggedUser"
-    );
-
-if(email){
-
-    const user =
-        JSON.parse(
-            localStorage.getItem(email)
-        );
-
-    if(user){
-
-        loadUser(user);
-
-        showSection(
-            "dashboard"
-        );
-    }
-
-}else{
-
-    showSection(
-        "auth"
+        function() {
+            alert("Permiso GPS denegado");
+        }
     );
 }
-```
 
+// Inicializar mapa
+function initMap() {
+
+    const mapElement = document.getElementById("map-container");
+
+    if (!mapElement) return;
+
+    if (map) {
+        map.invalidateSize();
+        return;
+    }
+
+    map = L.map(mapElement).setView(
+        [4.7110, -74.0721],
+        13
+    );
+
+    L.tileLayer(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution: "&copy; OpenStreetMap"
+        }
+    ).addTo(map);
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        map.setView([lat, lon], 15);
+
+        L.marker([lat, lon])
+            .addTo(map)
+            .bindPopup("Tu ubicación")
+            .openPopup();
+    });
+}
+
+// Al cargar la página
+window.onload = function() {
+
+    const loggedEmail = localStorage.getItem("loggedUser");
+
+    if (loggedEmail) {
+
+        const user = JSON.parse(
+            localStorage.getItem(loggedEmail)
+        );
+
+        if (user) {
+            loadUser(user);
+            showSection("dashboard");
+            return;
+        }
+    }
+
+    showSection("auth");
 };
