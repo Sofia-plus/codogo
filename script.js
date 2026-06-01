@@ -402,6 +402,7 @@ navigator.geolocation.getCurrentPosition(
             [lat,lon]
         )
         .addTo(map)
+        
         .bindPopup(
             "Tu ubicación"
         )
@@ -446,3 +447,4 @@ if(email){
 ```
 
 };
+alert("pueva ")
