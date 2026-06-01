@@ -1,3 +1,4 @@
+alert("JavaScript conectado");
 let map;
 let watchId;
 let startPosition = null;
@@ -447,4 +448,3 @@ if(email){
 ```
 
 };
-alert("pueva ")
