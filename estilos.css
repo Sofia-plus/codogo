@@ -227,3 +227,132 @@ font-size:2rem;
 height:350px;
 }
 }
+
+/* =========================
+   RESPONSIVE PARA CELULARES
+========================= */
+
+@media screen and (max-width: 768px){
+
+    /* NAVBAR */
+
+    nav{
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+
+    nav h1{
+        font-size: 2rem;
+    }
+
+    nav .flex.gap-4{
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .menu-btn{
+        width: 100%;
+        max-width: 200px;
+    }
+
+    /* CONTENEDOR */
+
+    .container{
+        padding: 15px !important;
+    }
+
+    /* LOGIN */
+
+    .max-w-lg{
+        width: 100% !important;
+    }
+
+    .input-field{
+        font-size: 16px;
+        padding: 14px;
+    }
+
+    /* DASHBOARD */
+
+    .grid{
+        grid-template-columns: 1fr !important;
+    }
+
+    .card{
+        width: 100%;
+    }
+
+    h2{
+        font-size: 1.8rem !important;
+        text-align: center;
+    }
+
+    h3{
+        font-size: 1.2rem !important;
+    }
+
+    /* MAPA */
+
+    #map{
+        height: 300px !important;
+        width: 100%;
+    }
+
+    /* BOTONES */
+
+    .main-btn{
+        width: 100%;
+        font-size: 16px;
+    }
+
+    button{
+        min-height: 45px;
+    }
+
+    /* PERFIL */
+
+    #profile .card{
+        margin: 10px;
+        padding: 20px;
+    }
+
+    #profileName{
+        font-size: 1.5rem;
+    }
+
+    /* TIENDA */
+
+    #store .grid{
+        grid-template-columns: 1fr !important;
+    }
+
+}
+
+/* =========================
+   CELULARES PEQUEÑOS
+========================= */
+
+@media screen and (max-width: 480px){
+
+    nav h1{
+        font-size: 1.7rem;
+    }
+
+    h2{
+        font-size: 1.5rem !important;
+    }
+
+    .card{
+        padding: 15px;
+    }
+
+    .input-field{
+        padding: 12px;
+    }
+
+    .main-btn{
+        padding: 12px;
+    }
+
+}
