@@ -20,6 +20,9 @@ function showSection(sectionId) {
     if (sectionId === "map") {
         setTimeout(initMap, 300);
     }
+    if(sectionId === "mapSection"){
+    setTimeout(initMap,300);
+}
 }
 
 // Cambiar entre login y registro
