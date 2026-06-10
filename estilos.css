@@ -356,3 +356,33 @@ height:350px;
     }
 
 }
+/* =======================
+   MENU PARA CELULAR
+======================= */
+
+@media (max-width: 768px){
+
+    nav{
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    nav .flex.gap-4{
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .menu-btn{
+        width: 100%;
+        padding: 12px;
+    }
+
+    #userNameDisplay{
+        display: block;
+        margin-bottom: 10px;
+    }
+
+}
