@@ -1,358 +1,207 @@
-body{
-font-family: Arial, Helvetica, sans-serif;
-}
-#map{
-width:100%;
-height:500px;
-border-radius:20px;
-margin-top:20px;
-}
-/* ===== PERFIL MEJORADO ===== */
-
-#section hidden{
-    max-width: 500px;
-    margin: 40px auto;
-    text-align: center;
-    background: linear-gradient(
-        135deg,
-        #1e293b,
-        #0f172a
-    );
-    border: 2px solid #10b981;
-    border-radius: 25px;
-    padding: 30px;
-    box-shadow: 0 0 25px rgba(16,185,129,.4);
-}
-
-#profile h2{
-    text-align: center;
-    color: #10b981;
-    font-size: 2.5rem;
-    margin-bottom: 25px;
-}
-
-#profileName{
-    font-size: 2rem;
-    font-weight: bold;
-    color: #10b981;
-    margin-bottom: 20px;
-}
-
-#profile .card p{
-    font-size: 1.2rem;
-    margin: 12px 0;
-    color: white;
-}
-
-/* Círculo para avatar */
-
-#profile .card::before{
-    content: "👤";
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px auto;
-    border-radius: 50%;
-    background: linear-gradient(
-        135deg,
-        #10b981,
-        #06b6d4
-    );
-    font-size: 60px;
-    box-shadow: 0 0 20px rgba(16,185,129,.5);
-}
-.hidden{
-display:none;
-}
-
-.menu-btn{
-background:#18181b;
-padding:10px 16px;
-border-radius:12px;
-transition:.3s;
-}
-
-.menu-btn:hover
-
-.input-field{
-width:100%;
-padding:12px;
-margin-top:10px;
-margin-bottom:10px;
-border-radius:12px;
-border:1px solid #3f3f46;
-background:#18181b;
-color:white;
-}
-
-.input-field:focus{
-outline:none;
-border-color:#10b981;
-}
-
-.main-btn{
-width:100%;
-margin-top:15px;
-padding:12px;
-border:none;
-border-radius:12px;
-background:#10b981;
-color:white;
-font-weight:bold;
-cursor:pointer;
-transition:.3s;
-}
-
-.main-btn:hover
-
-.card{
-background:#18181b;
-padding:24px;
-border-radius:24px;
-border:1px solid #27272a;
-}
-
-.card:hover{
-transform:translateY(-5px);
-transition:.3s;
-}
-
-#map{
-border-radius:20px;
-overflow:hidden;
-}
-
-#userNameDisplay{
-margin-right:10px;
-color:#10b981;
-font-weight:bold;
-}
-
-::-webkit-scrollbar{
-width:8px;
-}
-
-::-webkit-scrollbar-track{
-background:#09090b;
-}
-
-::-webkit-scrollbar-thumb{
-background:#10b981;
-border-radius:10px;
-}
-
-.section{
-animation:fadeIn .3s ease-in-out;
-}
-
-@keyframes fadeIn{
-from{
-opacity:0;
-transform:translateY(10px);
-}
-
-```
-to{
-    opacity:1;
-    transform:translateY(0);
-}
-```
-
-}
-
-
-.section{
-
-animation:
-fadeIn .6s ease;
-}
-
-@keyframes fadeIn{
-
-from{
-opacity:0;
-transform:
-translateY(25px);
-}
-
-to{
-opacity:1;
-transform:
-translateY(0);
-}
-}
-
-/* =====================
-   RESPONSIVE
-===================== */
-
-@media(max-width:768px){
-
-.navbar{
-
-flex-direction:column;
-
-gap:15px;
-}
-
-.menu{
-
-flex-wrap:wrap;
-    
-
-justify-content:center;
-}
-
-.auth-card{
-
-margin:30px 15px;
-
-padding:25px;
-}
-
-.title{
-
-font-size:2rem;
-}
-
-.welcome-title{
-
-font-size:2rem;
-}
-
-#map{
-
-height:350px;
-}
-}
-
-/* =========================
-   RESPONSIVE PARA CELULARES
-========================= */
-
-@media screen and (max-width: 768px){
-
-    /* NAVBAR */
-
-    nav{
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
+<style>
+    :root {
+        --primary: #10b981;
+        --primary-dark: #059669;
     }
 
-    nav h1{
-        font-size: 2rem;
+    body {
+        font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+        background: #09090b;
+        color: #e4e4e7;
     }
 
-    nav .flex.gap-4{
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .menu-btn{
+    #map {
         width: 100%;
-        max-width: 200px;
+        height: 500px;
+        border-radius: 20px;
+        margin-top: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     }
 
-    /* CONTENEDOR */
-
-    .container{
-        padding: 15px !important;
-    }
-
-    /* LOGIN */
-
-    .max-w-lg{
-        width: 100% !important;
-    }
-
-    .input-field{
+    /* ==================== INPUTS (LOGIN / REGISTRO) ==================== */
+    .input-field {
+        width: 100%;
+        padding: 14px 18px;
+        margin: 12px 0;
+        border-radius: 14px;
+        border: 2px solid #3f3f46;
+        background: #18181b;
+        color: #000000 !important;           /* Texto negro para que se vea al escribir */
         font-size: 16px;
-        padding: 14px;
+        transition: all 0.3s;
     }
 
-    /* DASHBOARD */
-
-    .grid{
-        grid-template-columns: 1fr !important;
+    .input-field:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.25);
+        background: #27272a;
     }
 
-    .card{
+    /* Placeholder más claro */
+    .input-field::placeholder {
+        color: #71717a;
+    }
+
+    /* ==================== BOTONES ==================== */
+    .main-btn {
         width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--primary), #34d399);
+        color: white;
+        font-weight: 600;
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
     }
 
-    h2{
-        font-size: 1.8rem !important;
+    .main-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        background: linear-gradient(135deg, #059669, #10b981);
+    }
+
+    .menu-btn {
+        background: #18181b;
+        padding: 12px 20px;
+        border-radius: 12px;
+        transition: all 0.3s;
+        border: 1px solid #3f3f46;
+    }
+
+    .menu-btn:hover {
+        background: #27272a;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    /* ==================== TARJETAS Y CARDS ==================== */
+    .card {
+        background: #18181b;
+        padding: 28px;
+        border-radius: 24px;
+        border: 1px solid #27272a;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 35px -10px rgb(0 0 0 / 0.4);
+        border-color: #3f3f46;
+    }
+
+    /* ==================== PERFIL ==================== */
+    #profile .card {
+        max-width: 520px;
+        margin: 40px auto;
         text-align: center;
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border: 3px solid var(--primary);
+        border-radius: 28px;
+        padding: 45px 35px;
+        box-shadow: 0 0 40px rgba(16, 185, 129, 0.35);
     }
 
-    h3{
-        font-size: 1.2rem !important;
+    #profile h2 {
+        color: #10b981;
+        font-size: 2.6rem;
+        margin-bottom: 20px;
     }
 
-    /* MAPA */
-
-    #map{
-        height: 300px !important;
-        width: 100%;
+    #profileName {
+        font-size: 2.1rem;
+        font-weight: 700;
+        color: #10b981;
+        margin: 15px 0;
     }
 
-    /* BOTONES */
-
-    .main-btn{
-        width: 100%;
-        font-size: 16px;
+    /* Avatar mejorado */
+    .avatar {
+        width: 130px;
+        height: 130px;
+        margin: 0 auto 25px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981, #22d3ee);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 65px;
+        box-shadow: 0 0 35px rgba(16, 185, 129, 0.6);
+        border: 5px solid #09090b;
     }
 
-    button{
-        min-height: 45px;
+    /* ==================== ANIMACIONES ==================== */
+    .section {
+        animation: fadeInUp 0.6s ease forwards;
     }
 
-    /* PERFIL */
-
-    #profile .card{
-        margin: 10px;
-        padding: 20px;
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    #profileName{
-        font-size: 1.5rem;
+    .hidden {
+        display: none !important;
     }
 
-    /* TIENDA */
-
-    #store .grid{
-        grid-template-columns: 1fr !important;
+    /* Scrollbar elegante */
+    ::-webkit-scrollbar {
+        width: 7px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #18181b;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #10b981;
+        border-radius: 20px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #34d399;
     }
 
-}
-
-/* =========================
-   CELULARES PEQUEÑOS
-========================= */
-
-@media screen and (max-width: 480px){
-
-    nav h1{
-        font-size: 1.7rem;
+    /* ==================== RESPONSIVE MEJORADO ==================== */
+    @media (max-width: 768px) {
+        #map {
+            height: 380px;
+        }
+        
+        .card {
+            padding: 22px;
+        }
+        
+        h2 {
+            font-size: 1.85rem !important;
+        }
     }
 
-    h2{
-        font-size: 1.5rem !important;
+    @media (max-width: 480px) {
+        nav {
+            flex-direction: column;
+            gap: 12px;
+            padding: 14px;
+        }
+        
+        #map {
+            height: 320px;
+        }
+        
+        .input-field {
+            padding: 13px 16px;
+            font-size: 16px;
+        }
+        
+        .main-btn {
+            padding: 16px;
+            font-size: 1.1rem;
+        }
     }
-
-    .card{
-        padding: 15px;
-    }
-
-    .input-field{
-        padding: 12px;
-    }
-
-    .main-btn{
-        padding: 12px;
-    }
-
-}
+</style>
