@@ -1,64 +1,117 @@
-alert("JavaScript conectado");
+// =========================
+// QUESTLINK 2.0
+// =========================
+
+let currentUser = null;
 
 let map = null;
+let marker = null;
 let watchId = null;
+
 let startPosition = null;
+let totalDistance = 0;
 
-// Mostrar secciones
-function showSection(sectionId) {
+const levelDistances = [
+    200,
+    400,
+    600,
+    800,
+    1000,
+    1500,
+    2000,
+    3000,
+    4000,
+    5000
+];
 
-    document.querySelectorAll(".section").forEach(section => {
+// =========================
+// SECCIONES
+// =========================
+
+function showSection(sectionId){
+
+    document.querySelectorAll(".section").forEach(section=>{
         section.classList.add("hidden");
     });
 
-    const section = document.getElementById(sectionId);
+    const target = document.getElementById(sectionId);
 
-    if (section) {
-        section.classList.remove("hidden");
+    if(target){
+        target.classList.remove("hidden");
     }
 
-    if (sectionId === "map") {
-        setTimeout(initMap, 300);
+    if(sectionId === "mapSection"){
+        setTimeout(initMap,300);
     }
 }
 
-// Cambiar entre login y registro
-function setAuthMode(mode) {
+// =========================
+// LOGIN / REGISTER
+// =========================
 
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
+function setAuthMode(mode){
 
-    if (!loginForm || !registerForm) return;
+    const loginForm =
+    document.getElementById("loginForm");
 
-    if (mode === "login") {
+    const registerForm =
+    document.getElementById("registerForm");
+
+    const loginTab =
+    document.getElementById("loginTab");
+
+    const registerTab =
+    document.getElementById("registerTab");
+
+    if(mode === "login"){
+
         loginForm.classList.remove("hidden");
         registerForm.classList.add("hidden");
-    } else {
+
+        loginTab.classList.add("tab-active");
+        registerTab.classList.remove("tab-active");
+
+    }else{
+
         registerForm.classList.remove("hidden");
         loginForm.classList.add("hidden");
+
+        registerTab.classList.add("tab-active");
+        loginTab.classList.remove("tab-active");
     }
 }
 
-// Registrar usuario
-function submitRegister() {
+function submitRegister(){
 
-    const username = document.getElementById("registerUsername").value.trim();
-    const email = document.getElementById("registerEmail").value.trim();
-    const password = document.getElementById("registerPassword").value;
-    const confirmPassword = document.getElementById("registerConfirmPassword").value;
+    const username =
+    document.getElementById("registerUsername").value.trim();
 
-    if (!username || !email || !password || !confirmPassword) {
+    const email =
+    document.getElementById("registerEmail").value.trim();
+
+    const password =
+    document.getElementById("registerPassword").value;
+
+    const confirm =
+    document.getElementById("registerConfirmPassword").value;
+
+    if(
+        !username ||
+        !email ||
+        !password ||
+        !confirm
+    ){
         alert("Completa todos los campos");
         return;
     }
 
-    if (password !== confirmPassword) {
+    if(password !== confirm){
         alert("Las contraseñas no coinciden");
         return;
     }
 
-    if (localStorage.getItem(email)) {
-        alert("Este correo ya está registrado");
+    if(localStorage.getItem(email)){
+        alert("Este correo ya existe");
         return;
     }
 
@@ -66,270 +119,470 @@ function submitRegister() {
         username,
         email,
         password,
-        level: 1,
-        tokens: 0
+        level:1,
+        xp:0,
+        tokens:0,
+        distance:0,
+        missions:0
     };
 
-    localStorage.setItem(email, JSON.stringify(user));
+    localStorage.setItem(
+        email,
+        JSON.stringify(user)
+    );
 
     alert("Cuenta creada correctamente");
-
-    document.getElementById("registerUsername").value = "";
-    document.getElementById("registerEmail").value = "";
-    document.getElementById("registerPassword").value = "";
-    document.getElementById("registerConfirmPassword").value = "";
 
     setAuthMode("login");
 }
 
-// Iniciar sesión
-function submitLogin() {
+function submitLogin(){
 
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
+    const email =
+    document.getElementById("loginEmail").value.trim();
 
-    const user = JSON.parse(localStorage.getItem(email));
+    const password =
+    document.getElementById("loginPassword").value;
 
-    if (!user) {
+    const user =
+    JSON.parse(localStorage.getItem(email));
+
+    if(!user){
         alert("Usuario no encontrado");
         return;
     }
 
-    if (user.password !== password) {
+    if(user.password !== password){
         alert("Contraseña incorrecta");
         return;
     }
 
-    localStorage.setItem("loggedUser", email);
+    localStorage.setItem(
+        "loggedUser",
+        email
+    );
 
     loadUser(user);
 
     showSection("dashboard");
 }
 
-// Cargar usuario
-function loadUser(user) {
+function logout(){
 
-    const dashboardUsername = document.getElementById("dashboardUsername");
-    const userNameDisplay = document.getElementById("userNameDisplay");
-    const logoutButton = document.getElementById("logoutButton");
-
-    if (dashboardUsername) {
-        dashboardUsername.textContent = user.username;
-    }
-
-    if (userNameDisplay) {
-        userNameDisplay.textContent = user.username;
-        userNameDisplay.classList.remove("hidden");
-    }
-
-    if (logoutButton) {
-        logoutButton.classList.remove("hidden");
-    }
-
-    const authSection = document.getElementById("auth");
-
-    if (authSection) {
-        authSection.classList.add("hidden");
-    }
-}
-
-// Cerrar sesión
-function logout() {
-
-    localStorage.removeItem("loggedUser");
-
-    alert("Sesión cerrada");
+    localStorage.removeItem(
+        "loggedUser"
+    );
 
     location.reload();
 }
 
-// Comprar artículos
-function buyItem(button) {
+// =========================
+// USUARIO
+// =========================
 
-    button.innerText = "Canjeado";
-    button.disabled = true;
+function loadUser(user){
 
-    alert("Recompensa canjeada");
+    currentUser = user;
+
+    document.getElementById(
+        "dashboardUsername"
+    ).textContent = user.username;
+
+    document.getElementById(
+        "userNameDisplay"
+    ).textContent = user.username;
+
+    document.getElementById(
+        "profileName"
+    ).textContent = user.username;
+
+    document.getElementById(
+        "profileLevel"
+    ).textContent = user.level;
+
+    document.getElementById(
+        "profileXP"
+    ).textContent = user.xp;
+
+    document.getElementById(
+        "profileTokens"
+    ).textContent = user.tokens;
+
+    document.getElementById(
+        "profileDistance"
+    ).textContent = Math.round(user.distance);
+
+    document.getElementById(
+        "profileMissions"
+    ).textContent = user.missions;
+
+    document.getElementById(
+        "levelDisplay"
+    ).textContent = user.level;
+
+    document.getElementById(
+        "xpDisplay"
+    ).textContent = user.xp;
+
+    document.getElementById(
+        "tokensDisplay"
+    ).textContent = user.tokens;
+
+    document.getElementById(
+        "xpText"
+    ).textContent =
+    user.xp + " / 100";
+
+    document.getElementById(
+        "xpFill"
+    ).style.width =
+    user.xp + "%";
+
+    document.getElementById(
+        "auth"
+    ).classList.add("hidden");
+
+    document.getElementById(
+        "logoutButton"
+    ).classList.remove("hidden");
+
+    updateMission();
 }
 
-// Subir foto
-function uploadPhoto(id, button) {
+function saveUser(){
 
-    const input = document.getElementById(`photoUpload-${id}`);
+    if(!currentUser) return;
 
-    if (!input) {
-        alert("No se encontró el campo de imagen");
-        return;
-    }
+    localStorage.setItem(
+        currentUser.email,
+        JSON.stringify(currentUser)
+    );
+}
 
-    const file = input.files[0];
+// =========================
+// MISIONES
+// =========================
 
-    if (!file) {
-        alert("Selecciona una imagen");
-        return;
-    }
+function updateMission(){
 
-    const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp"
+    const level =
+    currentUser.level;
+
+    const distanceGoal =
+    levelDistances[
+        Math.min(level-1,
+        levelDistances.length-1)
     ];
 
-    if (!allowedTypes.includes(file.type)) {
-        alert("Formato no permitido");
+    document.getElementById(
+        "missionText"
+    ).textContent =
+    `Camina ${distanceGoal} metros`;
+}
+
+function addRewards(){
+
+    currentUser.xp += 25;
+    currentUser.tokens += 15;
+    currentUser.missions += 1;
+
+    if(currentUser.xp >= 100){
+
+        currentUser.level++;
+
+        currentUser.xp = 0;
+
+        alert(
+        "🎉 Subiste al nivel "
+        + currentUser.level
+        );
+    }
+
+    saveUser();
+
+    loadUser(currentUser);
+}
+
+// =========================
+// GPS
+// =========================
+
+function startMission(){
+
+    const startPhoto =
+    document.getElementById(
+        "startPhoto"
+    ).files[0];
+
+    const endPhoto =
+    document.getElementById(
+        "endPhoto"
+    ).files[0];
+
+    if(!startPhoto){
+        alert(
+        "Debes subir la foto inicial"
+        );
         return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-        alert("La imagen supera los 5MB");
-        return;
-    }
-
-    button.innerText = "Foto verificada";
-    button.disabled = true;
-
-    alert("Imagen validada correctamente");
-}
-
-// Calcular distancia GPS
-function calculateDistance(lat1, lon1, lat2, lon2) {
-
-    const R = 6371000;
-
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-
-    const c = 2 * Math.atan2(
-        Math.sqrt(a),
-        Math.sqrt(1 - a)
-    );
-
-    return R * c;
-}
-
-// Verificación GPS
-function startWalkVerification(id, button) {
-
-    if (!navigator.geolocation) {
+    if(!navigator.geolocation){
         alert("GPS no disponible");
         return;
     }
 
-    button.innerText = "Iniciando GPS...";
+    totalDistance = 0;
 
-    navigator.geolocation.getCurrentPosition(
+    navigator.geolocation
+    .getCurrentPosition(position=>{
 
-        function(position) {
+        startPosition = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+        };
 
-            startPosition = {
-                lat: position.coords.latitude,
-                lon: position.coords.longitude
-            };
+        alert(
+        "GPS iniciado. Comienza a caminar."
+        );
 
-            watchId = navigator.geolocation.watchPosition(
+        watchGPS(endPhoto);
 
-                function(newPosition) {
+    });
+}
 
-                    const distance = calculateDistance(
-                        startPosition.lat,
-                        startPosition.lon,
-                        newPosition.coords.latitude,
-                        newPosition.coords.longitude
-                    );
+function watchGPS(endPhoto){
 
-                    button.innerText =
-                        "Distancia: " +
-                        Math.round(distance) +
-                        " m";
+    watchId =
+    navigator.geolocation.watchPosition(
 
-                    if (distance >= 1800) {
+    position=>{
 
-                        navigator.geolocation.clearWatch(watchId);
+        const distance =
+        calculateDistance(
+        startPosition.lat,
+        startPosition.lon,
+        position.coords.latitude,
+        position.coords.longitude
+        );
 
-                        button.innerText = "Misión completada";
-                        button.disabled = true;
+        totalDistance = distance;
 
-                        alert("¡Has recorrido 1.8 km!");
-                    }
+        document.getElementById(
+        "distanceDisplay"
+        ).textContent =
+        "Distancia recorrida: "
+        + Math.round(distance)
+        + " m";
 
-                },
+        const target =
+        levelDistances[
+        Math.min(
+        currentUser.level-1,
+        levelDistances.length-1
+        )
+        ];
 
-                function() {
-                    alert("Error al leer el GPS");
-                },
+        if(distance >= target){
 
-                {
-                    enableHighAccuracy: true
-                }
+            navigator.geolocation
+            .clearWatch(watchId);
+
+            if(!endPhoto){
+
+                alert(
+                "Sube la foto final"
+                );
+
+                return;
+            }
+
+            currentUser.distance +=
+            distance;
+
+            addRewards();
+
+            alert(
+            "🎉 Misión completada"
             );
-        },
-
-        function() {
-            alert("Permiso GPS denegado");
         }
+
+    },
+
+    error=>{
+        alert(
+        "Error leyendo GPS"
+        );
+    },
+
+    {
+        enableHighAccuracy:true
+    }
+
     );
 }
 
-// Inicializar mapa
-function initMap() {
+// =========================
+// DISTANCIA
+// =========================
 
-    const mapElement = document.getElementById("map-container");
+function calculateDistance(
+lat1,
+lon1,
+lat2,
+lon2
+){
 
-    if (!mapElement) return;
+    const R = 6371000;
 
-    if (map) {
+    const dLat =
+    (lat2-lat1) *
+    Math.PI / 180;
+
+    const dLon =
+    (lon2-lon1) *
+    Math.PI / 180;
+
+    const a =
+
+    Math.sin(dLat/2) *
+    Math.sin(dLat/2)
+
+    +
+
+    Math.cos(
+    lat1*Math.PI/180
+    )
+
+    *
+
+    Math.cos(
+    lat2*Math.PI/180
+    )
+
+    *
+
+    Math.sin(dLon/2) *
+    Math.sin(dLon/2);
+
+    const c =
+    2*Math.atan2(
+    Math.sqrt(a),
+    Math.sqrt(1-a)
+    );
+
+    return R*c;
+}
+
+// =========================
+// MAPA
+// =========================
+
+function initMap(){
+
+    const mapDiv =
+    document.getElementById("map");
+
+    if(!mapDiv) return;
+
+    if(map){
+
         map.invalidateSize();
         return;
     }
 
-    map = L.map(mapElement).setView(
-        [4.7110, -74.0721],
-        13
+    map =
+    L.map("map")
+    .setView(
+    [4.7110,-74.0721],
+    13
     );
 
     L.tileLayer(
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-            attribution: "&copy; OpenStreetMap"
-        }
+    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        attribution:
+        "&copy; OpenStreetMap"
+    }
     ).addTo(map);
 
-    navigator.geolocation.getCurrentPosition(function(position) {
+    navigator.geolocation
+    .getCurrentPosition(position=>{
 
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+        const lat =
+        position.coords.latitude;
 
-        map.setView([lat, lon], 15);
+        const lon =
+        position.coords.longitude;
 
-        L.marker([lat, lon])
-            .addTo(map)
-            .bindPopup("Tu ubicación")
-            .openPopup();
+        map.setView(
+        [lat,lon],
+        15
+        );
+
+        marker =
+        L.marker(
+        [lat,lon]
+        )
+        .addTo(map)
+        .bindPopup(
+        "Tu ubicación"
+        );
+
     });
 }
 
-// Al cargar la página
-window.onload = function() {
+// =========================
+// TIENDA
+// =========================
 
-    const loggedEmail = localStorage.getItem("loggedUser");
+function buyItem(price){
 
-    if (loggedEmail) {
+    if(currentUser.tokens < price){
 
-        const user = JSON.parse(
-            localStorage.getItem(loggedEmail)
+        alert(
+        "No tienes suficientes tokens"
         );
 
-        if (user) {
+        return;
+    }
+
+    currentUser.tokens -= price;
+
+    saveUser();
+
+    loadUser(currentUser);
+
+    alert(
+    "🎁 Compra realizada"
+    );
+}
+
+// =========================
+// INICIO
+// =========================
+
+window.onload = ()=>{
+
+    const email =
+    localStorage.getItem(
+    "loggedUser"
+    );
+
+    if(email){
+
+        const user =
+        JSON.parse(
+        localStorage.getItem(email)
+        );
+
+        if(user){
+
             loadUser(user);
-            showSection("dashboard");
+
+            showSection(
+            "dashboard"
+            );
+
             return;
         }
     }
