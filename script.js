@@ -3,7 +3,9 @@ alert("JavaScript conectado");
 let map = null;
 let watchId = null;
 let startPosition = null;
-
+let routePoints = [];
+let routeLine = null;
+let currentMarker = null;
 // Mostrar secciones
 function showSection(sectionId) {
 
@@ -247,14 +249,45 @@ function startWalkVerification(id, button) {
                         newPosition.coords.latitude,
                         newPosition.coords.longitude
                     );
+                const lat = newPosition.coords.latitude;
+                const lng = newPosition.coords.longitude;
 
+                // Guardar punto recorrido
+                routePoints.push([lat, lng]);
+
+                // Mover marcador
+                if(currentMarker){
+                    currentMarker.setLatLng([lat, lng]);
+                }
+
+                // Dibujar ruta
+                if(routeLine){
+                    map.removeLayer(routeLine);
+                }
+                
+                routeLine = L.polyline(
+                    routePoints,
+                    {
+                        color: "lime",
+                        weight: 5,
+                        opacity: 0.8
+                    }
+                ).addTo(map);
+                
+                // Centrar mapa
+                map.panTo([lat, lng]);
                     button.innerText =
                         "Distancia: " +
                         Math.round(distance) +
                         " m";
 
                     if (distance >= 1800) {
+                        routePoints = [];
 
+                        if(routeLine){
+                            map.removeLayer(routeLine);
+                            routeLine = null;
+                        }
                         navigator.geolocation.clearWatch(watchId);
 
                         button.innerText = "Misión completada";
@@ -316,7 +349,7 @@ function initMap() {
                 16
             );
 
-            L.marker([lat,lng])
+            currentMarker = L.marker([lat,lng])
             .addTo(map)
             .bindPopup("📍 Tu ubicación")
             .openPopup();
