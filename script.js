@@ -281,16 +281,12 @@ function startWalkVerification(id, button) {
 // Inicializar mapa
 function initMap() {
 
-    const mapElement = document.getElementById("map-container");
-
-    if (!mapElement) return;
-
     if (map) {
         map.invalidateSize();
         return;
     }
 
-    map = L.map(mapElement).setView(
+    map = L.map("map").setView(
         [4.7110, -74.0721],
         13
     );
@@ -302,18 +298,39 @@ function initMap() {
         }
     ).addTo(map);
 
-    navigator.geolocation.getCurrentPosition(function(position) {
+    navigator.geolocation.getCurrentPosition(
 
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+        function(position){
 
-        map.setView([lat, lon], 15);
+            const lat =
+            position.coords.latitude;
 
-        L.marker([lat, lon])
+            const lng =
+            position.coords.longitude;
+
+            map.setView(
+                [lat, lng],
+                16
+            );
+
+            L.marker([lat,lng])
             .addTo(map)
-            .bindPopup("Tu ubicación")
+            .bindPopup("📍 Tu ubicación")
             .openPopup();
-    });
+
+        },
+
+        function(error){
+
+            console.log(error);
+
+            alert(
+                "Debes permitir la ubicación"
+            );
+
+        }
+
+    );
 }
 
 // Al cargar la página
