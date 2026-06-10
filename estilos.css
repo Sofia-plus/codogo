@@ -1,28 +1,115 @@
+/* ===== GENERAL ===== */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
 body{
-font-family: Arial, Helvetica, sans-serif;
+font-family:'Segoe UI',sans-serif;
+background:#09090b;
+color:white;
+min-height:100vh;
 }
 
-.hidden{
-display:none;
+/* ===== NAVBAR ===== */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 25px;
+background:#111827;
+border-bottom:1px solid #27272a;
+position:sticky;
+top:0;
+z-index:1000;
 }
 
-.menu-btn{
+.logo{
+font-size:1.8rem;
+font-weight:bold;
+color:#10b981;
+}
+
+.menu{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.menu button{
 background:#18181b;
-padding:10px 16px;
+color:white;
+border:none;
+padding:10px 15px;
 border-radius:12px;
+cursor:pointer;
 transition:.3s;
 }
 
-.menu-btn:hover
+.menu button:hover{
+background:#10b981;
+transform:translateY(-2px);
+}
+
+/* ===== LOGIN ===== */
+
+.auth-card{
+max-width:500px;
+margin:auto;
+margin-top:50px;
+background:#18181b;
+padding:30px;
+border-radius:25px;
+border:1px solid #27272a;
+box-shadow:0 0 20px rgba(16,185,129,.15);
+}
+
+.title{
+font-size:2rem;
+font-weight:bold;
+text-align:center;
+margin-bottom:10px;
+}
+
+.subtitle{
+text-align:center;
+color:#a1a1aa;
+margin-bottom:25px;
+}
+
+.tabs{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
+.tabs button{
+flex:1;
+padding:12px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+background:#27272a;
+color:white;
+}
+
+.tab-active{
+background:#10b981 !important;
+}
+
+/* ===== INPUTS ===== */
 
 .input-field{
 width:100%;
-padding:12px;
+padding:14px;
 margin-top:10px;
 margin-bottom:10px;
-border-radius:12px;
+border-radius:14px;
 border:1px solid #3f3f46;
-background:#18181b;
+background:#27272a;
 color:white;
 }
 
@@ -31,12 +118,14 @@ outline:none;
 border-color:#10b981;
 }
 
+/* ===== BOTONES ===== */
+
 .main-btn{
 width:100%;
+padding:14px;
 margin-top:15px;
-padding:12px;
 border:none;
-border-radius:12px;
+border-radius:14px;
 background:#10b981;
 color:white;
 font-weight:bold;
@@ -44,59 +133,243 @@ cursor:pointer;
 transition:.3s;
 }
 
-.main-btn:hover
+.main-btn:hover{
+background:#059669;
+transform:translateY(-2px);
+}
+
+.google-btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:white;
+color:black;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+}
+
+.logout-btn{
+background:#ef4444;
+color:white;
+border:none;
+padding:10px 16px;
+border-radius:12px;
+cursor:pointer;
+}
+
+/* ===== DIVIDER ===== */
+
+.divider{
+text-align:center;
+margin:20px 0;
+position:relative;
+}
+
+.divider span{
+background:#18181b;
+padding:0 10px;
+color:#a1a1aa;
+}
+
+.divider::before{
+content:"";
+position:absolute;
+top:50%;
+left:0;
+width:100%;
+height:1px;
+background:#3f3f46;
+z-index:-1;
+}
+
+/* ===== TITULOS ===== */
+
+.welcome-title{
+font-size:2rem;
+font-weight:bold;
+margin-bottom:25px;
+}
+
+.section-title{
+font-size:2rem;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+/* ===== TARJETAS ===== */
 
 .card{
 background:#18181b;
-padding:24px;
+padding:25px;
 border-radius:24px;
 border:1px solid #27272a;
+transition:.3s;
 }
 
 .card:hover{
 transform:translateY(-5px);
-transition:.3s;
+border-color:#10b981;
 }
 
-#map{
+.mission-card{
+background:#18181b;
+padding:25px;
+border-radius:24px;
+margin-top:20px;
+border:1px solid #27272a;
+}
+
+/* ===== ESTADISTICAS ===== */
+
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:20px;
+margin-bottom:25px;
+}
+
+.stat-card{
+background:#18181b;
+padding:20px;
 border-radius:20px;
+text-align:center;
+border:1px solid #27272a;
+}
+
+.stat-card h3{
+margin-bottom:10px;
+}
+
+.stat-card p{
+font-size:1.6rem;
+font-weight:bold;
+color:#10b981;
+}
+
+/* ===== XP ===== */
+
+.xp-container{
+margin-bottom:25px;
+}
+
+.xp-header{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+}
+
+.xp-bar{
+height:18px;
+background:#27272a;
+border-radius:999px;
 overflow:hidden;
 }
 
-#userNameDisplay{
-margin-right:10px;
-color:#10b981;
+.xp-fill{
+width:0%;
+height:100%;
+background:#10b981;
+transition:.5s;
+}
+
+/* ===== MAPA ===== */
+
+#map{
+height:500px;
+border-radius:20px;
+margin-top:20px;
+overflow:hidden;
+border:2px solid #27272a;
+}
+
+.distance-box{
+margin-top:20px;
+padding:15px;
+background:#27272a;
+border-radius:12px;
 font-weight:bold;
 }
 
-::-webkit-scrollbar{
-width:8px;
+/* ===== PERFIL ===== */
+
+.profile-card{
+background:#18181b;
+padding:30px;
+border-radius:25px;
+text-align:center;
+max-width:500px;
+margin:auto;
 }
 
-::-webkit-scrollbar-track{
-background:#09090b;
+.avatar{
+width:120px;
+height:120px;
+border-radius:50%;
+margin-bottom:20px;
+border:4px solid #10b981;
 }
 
-::-webkit-scrollbar-thumb{
-background:#10b981;
-border-radius:10px;
+/* ===== TIENDA ===== */
+
+.store-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
 }
+
+/* ===== ANIMACIONES ===== */
 
 .section{
-animation:fadeIn .3s ease-in-out;
+animation:fadeIn .4s ease;
 }
 
 @keyframes fadeIn{
 from{
 opacity:0;
-transform:translateY(10px);
+transform:translateY(15px);
 }
 
-```
 to{
-    opacity:1;
-    transform:translateY(0);
+opacity:1;
+transform:translateY(0);
 }
-```
+}
+
+/* ===== UTILIDADES ===== */
+
+.hidden{
+display:none;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media(max-width:768px){
+
+.navbar{
+flex-direction:column;
+gap:15px;
+}
+
+.menu{
+justify-content:center;
+}
+
+.logo{
+font-size:1.5rem;
+}
+
+.welcome-title{
+font-size:1.6rem;
+}
+
+.section-title{
+font-size:1.6rem;
+}
+
+#map{
+height:350px;
+}
 
 }
