@@ -1,108 +1,91 @@
-<!DOCTYPE html>
+i<!DOCTYPE html>
+
 <html lang="es">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>QuestLink 2.0</title>
+<title>QuestLink</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <link rel="stylesheet" href="style.css">
 
-<link
-rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<script
-src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 </head>
 
 <body class="bg-zinc-950 text-white">
 
-<!-- NAVBAR -->
+<nav class="bg-black border-b border-zinc-800 p-4 flex justify-between items-center">
 
-<nav class="navbar">
+<h1 class="text-3xl font-bold text-emerald-400">
+QuestLink
+</h1>
 
-<div class="logo">
-🎮 QuestLink
-</div>
+<div class="flex gap-4">
 
-<div class="menu">
-
-<button onclick="showSection('dashboard')">
+<button onclick="showSection('dashboard')" class="menu-btn">
 Inicio
 </button>
 
-<button onclick="showSection('missions')">
+<button onclick="showSection('missions')" class="menu-btn">
 Misiones
 </button>
 
-<button onclick="showSection('mapSection')">
+<button onclick="showSection('mapSection')" class="menu-btn">
 Mapa
 </button>
 
-<button onclick="showSection('store')">
+<button onclick="showSection('store')" class="menu-btn">
 Tienda
 </button>
 
-<button onclick="showSection('profile')">
+<button onclick="showSection('profile')" class="menu-btn">
 Perfil
 </button>
 
 </div>
 
 <div>
-
 <span id="userNameDisplay"></span>
 
 <button
 id="logoutButton"
-class="logout-btn hidden"
-onclick="logout()">
-Salir
-</button>
+onclick="logout()"
+class="bg-red-500 px-4 py-2 rounded-xl hidden">
+Cerrar sesión </button>
 
 </div>
 
 </nav>
 
-<!-- CONTENEDOR -->
-
-<div class="container mx-auto p-5">
+<div class="container mx-auto p-6">
 
 <!-- LOGIN -->
 
 <div id="auth" class="section">
 
-<div class="auth-card">
+<div class="max-w-lg mx-auto bg-zinc-900 p-8 rounded-3xl">
 
-<h1 class="title">
+<h2 class="text-3xl font-bold mb-6">
 Bienvenido a QuestLink
-</h1>
+</h2>
 
-<p class="subtitle">
-Convierte tus recorridos en recompensas
-</p>
-
-<div class="tabs">
+<div class="flex gap-2 mb-6">
 
 <button
 id="loginTab"
 onclick="setAuthMode('login')"
-class="tab-active">
-Iniciar Sesión
-</button>
+class="bg-emerald-500 px-4 py-2 rounded-xl">
+Iniciar sesión </button>
 
 <button
 id="registerTab"
-onclick="setAuthMode('register')">
-Registrarse
-</button>
+onclick="setAuthMode('register')"
+class="bg-zinc-800 px-4 py-2 rounded-xl">
+Registrarse </button>
 
 </div>
 
@@ -113,7 +96,7 @@ Registrarse
 <input
 id="loginEmail"
 type="email"
-placeholder="Correo electrónico"
+placeholder="Correo"
 class="input-field">
 
 <input
@@ -123,20 +106,9 @@ placeholder="Contraseña"
 class="input-field">
 
 <button
-class="main-btn"
-onclick="submitLogin()">
-Entrar
-</button>
-
-<div class="divider">
-<span>o</span>
-</div>
-
-<button
-id="googleLoginBtn"
-class="google-btn">
-🔵 Continuar con Google
-</button>
+onclick="submitLogin()"
+class="main-btn">
+Entrar </button>
 
 </div>
 
@@ -147,7 +119,7 @@ class="google-btn">
 <input
 id="registerUsername"
 type="text"
-placeholder="Nombre de usuario"
+placeholder="Usuario"
 class="input-field">
 
 <input
@@ -169,10 +141,9 @@ placeholder="Confirmar contraseña"
 class="input-field">
 
 <button
-class="main-btn"
-onclick="submitRegister()">
-Crear Cuenta
-</button>
+onclick="submitRegister()"
+class="main-btn">
+Crear cuenta </button>
 
 </div>
 
@@ -184,72 +155,54 @@ Crear Cuenta
 
 <div id="dashboard" class="section hidden">
 
-<h2 class="welcome-title">
+<h2 class="text-4xl font-bold mb-6">
 Hola,
 <span id="dashboardUsername">
 Jugador
 </span>
-👋
 </h2>
 
-<!-- ESTADISTICAS -->
+<div class="grid md:grid-cols-2 gap-6">
 
-<div class="stats-grid">
+<div class="card">
 
-<div class="stat-card">
-<h3>🏆 Nivel</h3>
-<p id="levelDisplay">1</p>
-</div>
-
-<div class="stat-card">
-<h3>⭐ XP</h3>
-<p id="xpDisplay">0</p>
-</div>
-
-<div class="stat-card">
-<h3>💰 Tokens</h3>
-<p id="tokensDisplay">0</p>
-</div>
-
-</div>
-
-<!-- BARRA XP -->
-
-<div class="xp-container">
-
-<div class="xp-header">
-<span>Experiencia</span>
-<span id="xpText">0 / 100</span>
-</div>
-
-<div class="xp-bar">
-
-<div
-id="xpFill"
-class="xp-fill">
-</div>
-
-</div>
-
-</div>
-
-<!-- MISION -->
-
-<div class="mission-card">
-
-<h3>
-🎯 Misión Actual
+<h3 class="text-xl font-bold">
+🐉 Misión GPS
 </h3>
 
-<p id="missionText">
-Camina 200 metros
+<p>
+Camina 1.8 km para completar la misión.
 </p>
 
 <button
-class="main-btn"
-onclick="startMission()">
-Iniciar Misión
-</button>
+onclick="startWalkVerification(1,this)"
+class="main-btn">
+Iniciar GPS </button>
+
+</div>
+
+<div class="card">
+
+<h3 class="text-xl font-bold">
+🏠 Misión Foto
+</h3>
+
+<p>
+Sube una foto de tu escritorio.
+</p>
+
+<input
+id="photoUpload-2"
+type="file"
+accept="image/*"
+class="mt-3">
+
+<button
+onclick="uploadPhoto(2,this)"
+class="main-btn">
+Subir Foto </button>
+
+</div>
 
 </div>
 
@@ -259,23 +212,20 @@ Iniciar Misión
 
 <div id="missions" class="section hidden">
 
-<h2 class="section-title">
-🎯 Misiones
+<h2 class="text-3xl font-bold mb-6">
+Misiones
 </h2>
-
-<div id="missionsContainer">
 
 <div class="card">
 
-<h3>
-Nivel 1
+<h3 class="text-xl font-bold">
+🐉 Caminar 1.8 KM
 </h3>
 
-<p>
-Camina 200 metros
-</p>
-
-</div>
+<button
+onclick="startWalkVerification(1,this)"
+class="main-btn">
+Verificar GPS </button>
 
 </div>
 
@@ -285,41 +235,14 @@ Camina 200 metros
 
 <div id="mapSection" class="section hidden">
 
-<h2 class="section-title">
-🗺️ Mapa
+<h2 class="text-3xl font-bold mb-6">
+Mapa
 </h2>
 
-<div class="card">
-
-<p>
-📸 Foto Inicial
-</p>
-
-<input
-id="startPhoto"
-type="file"
-accept="image/*"
-capture="environment">
-
-<p class="mt-4">
-📸 Foto Final
-</p>
-
-<input
-id="endPhoto"
-type="file"
-accept="image/*"
-capture="environment">
-
 <div
-id="distanceDisplay"
-class="distance-box">
-Distancia recorrida: 0 m
+id="map"
+style="height:500px;">
 </div>
-
-</div>
-
-<div id="map"></div>
 
 </div>
 
@@ -327,63 +250,48 @@ Distancia recorrida: 0 m
 
 <div id="store" class="section hidden">
 
-<h2 class="section-title">
-🛒 Tienda
+<h2 class="text-3xl font-bold mb-6">
+Tienda
 </h2>
 
-<div class="store-grid">
+<div class="grid md:grid-cols-3 gap-6">
 
 <div class="card">
 
-<h3>
-⚔️ Skin Legendaria
-</h3>
+<h3>⚔️ Skin Legendaria</h3>
 
-<p>
-150 Tokens
-</p>
+<p>150 Tokens</p>
 
 <button
-class="main-btn"
-onclick="buyItem(150)">
-Canjear
-</button>
+onclick="buyItem(this)"
+class="main-btn">
+Canjear </button>
 
 </div>
 
 <div class="card">
 
-<h3>
-🔥 XP x2
-</h3>
+<h3>⏱️ +2 Horas</h3>
 
-<p>
-120 Tokens
-</p>
+<p>80 Tokens</p>
 
 <button
-class="main-btn"
-onclick="buyItem(120)">
-Canjear
-</button>
+onclick="buyItem(this)"
+class="main-btn">
+Canjear </button>
 
 </div>
 
 <div class="card">
 
-<h3>
-🎨 Avatar Épico
-</h3>
+<h3>🔥 XP x2</h3>
 
-<p>
-200 Tokens
-</p>
+<p>120 Tokens</p>
 
 <button
-class="main-btn"
-onclick="buyItem(200)">
-Canjear
-</button>
+onclick="buyItem(this)"
+class="main-btn">
+Canjear </button>
 
 </div>
 
@@ -395,53 +303,22 @@ Canjear
 
 <div id="profile" class="section hidden">
 
-<h2 class="section-title">
-👤 Perfil
+<h2 class="text-3xl font-bold mb-6">
+Perfil
 </h2>
 
-<div class="profile-card">
+<div class="card">
 
-<img
-src="https://i.pravatar.cc/150"
-class="avatar">
-
-<h3 id="profileName">
+<p id="profileName">
 Usuario
-</h3>
-
-<p>
-🏆 Nivel:
-<span id="profileLevel">
-1
-</span>
 </p>
 
 <p>
-⭐ XP:
-<span id="profileXP">
-0
-</span>
+Nivel 1
 </p>
 
 <p>
-💰 Tokens:
-<span id="profileTokens">
-0
-</span>
-</p>
-
-<p>
-🚶 Distancia Total:
-<span id="profileDistance">
-0
-</span> m
-</p>
-
-<p>
-✅ Misiones:
-<span id="profileMissions">
-0
-</span>
+0 Tokens
 </p>
 
 </div>
@@ -449,7 +326,6 @@ Usuario
 </div>
 
 </div>
-
 <script src="script.js"></script>
 
 </body>
