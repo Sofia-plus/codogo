@@ -221,10 +221,9 @@ Jugador
 <span class="text-red-400 text-xs font-bold uppercase"><i class="fa-solid fa-video"></i> Video</span>
 <h3 class="text-xl font-bold mt-2">🏋️‍♂️ 15 Sentadillas</h3>
 <p class="text-sm text-zinc-400 mb-3">Sube un video corto con la técnica correcta.</p>
-<input id="upload-squats" type="file" accept="video/*" class="w-full text-sm mb-4 mt-2">
-<button onclick="submitEvidence('squats', this)" class="main-btn">Subir Video</button>
+<input id="evidenceUpload-squats" type="file" accept="video/*" class="w-full text-sm mb-4 mt-2">
+<button onclick="uploadEvidence('squats', this)" class="main-btn">Subir Video</button>
 </div>
-
 <div class="card border-l-4 border-blue-500">
 <span class="text-blue-400 text-xs font-bold uppercase"><i class="fa-solid fa-camera"></i> Foto</span>
 <h3 class="text-xl font-bold mt-2">💧 Tomar Agua</h3>
@@ -261,15 +260,16 @@ Misiones
 
 <!-- MAPA -->
 <div id="mapSection" class="section hidden">
-<h2 class="text-3xl font-bold mb-6">
-Mapa
-</h2>
-<div
-id="map"
-style="height:500px;">
+    <h2 class="text-3xl font-bold mb-6">
+        Mapa
+    </h2>
+    <button onclick="startWalkVerification('mision1', this)" class="main-btn mb-6">
+        📍 Fijar Ubicación e Iniciar 1.3 km
+    </button>
+    
+    <div id="map" style="height:500px; border-radius: 16px; border: 2px solid #3f3f46;">
+    </div>
 </div>
-</div>
-
 <!-- TIENDA -->
 <div id="store" class="section hidden">
 <h2 class="text-3xl font-bold mb-6">
