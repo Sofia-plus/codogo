@@ -6,6 +6,8 @@ let startPosition = null;
 let routePoints = [];
 let routeLine = null;
 let currentMarker = null;
+let totalDistance = 0;
+let lastPosition = null;
 // Mostrar secciones
 function showSection(sectionId) {
 
@@ -159,44 +161,44 @@ function buyItem(button) {
 }
 
 // Subir foto
-function uploadPhoto(id, button) {
-
-    const input = document.getElementById(`photoUpload-${id}`);
+// Subir evidencia (Foto o Video)
+function uploadEvidence(id, button) {
+    const input = document.getElementById(`evidenceUpload-${id}`);
 
     if (!input) {
-        alert("No se encontró el campo de imagen");
+        alert("No se encontró el campo de archivo");
         return;
     }
 
     const file = input.files[0];
 
     if (!file) {
-        alert("Selecciona una imagen");
+        alert("Selecciona una imagen o video");
         return;
     }
 
+    // Permitir imágenes y videos
     const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/webp"
+        "image/jpeg", "image/png", "image/webp",
+        "video/mp4", "video/webm", "video/ogg"
     ];
 
     if (!allowedTypes.includes(file.type)) {
-        alert("Formato no permitido");
+        alert("Formato no permitido. Sube una imagen o un video.");
         return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-        alert("La imagen supera los 5MB");
+    // Aumentar el límite a 50MB para permitir videos
+    if (file.size > 50 * 1024 * 1024) {
+        alert("El archivo supera los 50MB permitidos");
         return;
     }
 
-    button.innerText = "Foto verificada";
+    button.innerText = "Evidencia verificada";
     button.disabled = true;
 
-    alert("Imagen validada correctamente");
+    alert("Evidencia validada correctamente");
 }
-
 // Calcular distancia GPS
 function calculateDistance(lat1, lon1, lat2, lon2) {
 
@@ -221,99 +223,102 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 // Verificación GPS
+// Verificación GPS y Rastreo de Ruta
 function startWalkVerification(id, button) {
-
     if (!navigator.geolocation) {
-        alert("GPS no disponible");
+        alert("GPS no disponible en este dispositivo");
         return;
     }
 
-    button.innerText = "Iniciando GPS...";
+    button.innerText = "Fijando ubicación...";
+    totalDistance = 0; 
+    routePoints = []; 
 
+    // 1. Fijar la ubicación actual del usuario antes de empezar
     navigator.geolocation.getCurrentPosition(
-
         function(position) {
-
-            startPosition = {
+            lastPosition = {
                 lat: position.coords.latitude,
                 lon: position.coords.longitude
             };
+            
+            routePoints.push([lastPosition.lat, lastPosition.lon]);
 
+            if (currentMarker) {
+                currentMarker.setLatLng([lastPosition.lat, lastPosition.lon]);
+                map.panTo([lastPosition.lat, lastPosition.lon]);
+            }
+
+            button.innerText = "Caminando: 0 / 1300 m";
+
+            // 2. Comenzar a rastrear el movimiento
             watchId = navigator.geolocation.watchPosition(
-
                 function(newPosition) {
+                    const newLat = newPosition.coords.latitude;
+                    const newLng = newPosition.coords.longitude;
 
-                    const distance = calculateDistance(
-                        startPosition.lat,
-                        startPosition.lon,
-                        newPosition.coords.latitude,
-                        newPosition.coords.longitude
+                    // Calcular distancia desde el último punto registrado
+                    const stepDistance = calculateDistance(
+                        lastPosition.lat, lastPosition.lon,
+                        newLat, newLng
                     );
-                const lat = newPosition.coords.latitude;
-                const lng = newPosition.coords.longitude;
 
-                // Guardar punto recorrido
-                routePoints.push([lat, lng]);
+                    // Solo registrar si el usuario se movió más de 2 metros (evita "ruido" del GPS estático)
+                    if (stepDistance > 2) {
+                        totalDistance += stepDistance;
+                        lastPosition = { lat: newLat, lon: newLng };
+                        
+                        routePoints.push([newLat, newLng]);
 
-                // Mover marcador
-                if(currentMarker){
-                    currentMarker.setLatLng([lat, lng]);
-                }
+                        // Mover marcador
+                        if(currentMarker){
+                            currentMarker.setLatLng([newLat, newLng]);
+                        }
 
-                // Dibujar ruta
-                if(routeLine){
-                    map.removeLayer(routeLine);
-                }
-                
-                routeLine = L.polyline(
-                    routePoints,
-                    {
-                        color: "lime",
-                        weight: 5,
-                        opacity: 0.8
-                    }
-                ).addTo(map);
-                
-                // Centrar mapa
-                map.panTo([lat, lng]);
-                    button.innerText =
-                        "Distancia: " +
-                        Math.round(distance) +
-                        " m";
-
-                    if (distance >= 1800) {
-                        routePoints = [];
-
+                        // Actualizar línea de ruta
                         if(routeLine){
                             map.removeLayer(routeLine);
-                            routeLine = null;
                         }
-                        navigator.geolocation.clearWatch(watchId);
+                        routeLine = L.polyline(routePoints, {
+                            color: "lime",
+                            weight: 5,
+                            opacity: 0.8
+                        }).addTo(map);
+                        
+                        map.panTo([newLat, newLng]);
 
-                        button.innerText = "Misión completada";
-                        button.disabled = true;
+                        button.innerText = `Caminando: ${Math.round(totalDistance)} / 1300 m`;
 
-                        alert("¡Has recorrido 1.8 km!");
+                        // 3. Evaluar si completó la misión (1.3 km = 1300 metros)
+                        if (totalDistance >= 1300) {
+                            navigator.geolocation.clearWatch(watchId);
+                            button.innerText = "Misión completada";
+                            button.disabled = true;
+
+                            // Otorgar 1 Token al usuario logueado
+                            const loggedEmail = localStorage.getItem("loggedUser");
+                            if (loggedEmail) {
+                                const user = JSON.parse(localStorage.getItem(loggedEmail));
+                                user.tokens = (user.tokens || 0) + 1;
+                                localStorage.setItem(loggedEmail, JSON.stringify(user));
+                            }
+
+                            alert("¡Felicidades! Has completado 1.3 km y ganaste 1 token.");
+                        }
                     }
-
                 },
-
                 function() {
-                    alert("Error al leer el GPS");
+                    alert("Se perdió la señal del GPS");
                 },
-
-                {
-                    enableHighAccuracy: true
-                }
+                { enableHighAccuracy: true }
             );
         },
-
         function() {
-            alert("Permiso GPS denegado");
-        }
+            alert("Permiso GPS denegado. No se puede iniciar la ruta.");
+        },
+        { enableHighAccuracy: true }
     );
 }
-
 // Inicializar mapa
 function initMap() {
 
