@@ -17,6 +17,62 @@
         background: #09090b;
         color: #e4e4e7;
     }
+}#profile {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Título */
+#profile h2 {
+    font-size: 38px;
+    font-weight: 800;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+}
+
+/* Tarjeta principal */
+.card {
+    background: rgba(24, 24, 27, 0.9);
+    padding: 35px 40px;
+    border-radius: 25px;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    width: 300px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s ease;
+}
+
+/* Efecto hover bonito */
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+}
+
+/* Textos dentro */
+.card p {
+    margin: 12px 0;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* Nombre de usuario destacado */
+#profileName {
+    font-size: 22px;
+    font-weight: 700;
+    color: #4ade80; /* verde bonito */
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
     /* ==================== INPUTS ==================== */
     .input-field {
